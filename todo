@@ -1,0 +1,7 @@
+./mvnw spring-boot:run
+./mvnw clean install
+
+
+
+sdk install java 24-tem
+sdk default java 24-tem
