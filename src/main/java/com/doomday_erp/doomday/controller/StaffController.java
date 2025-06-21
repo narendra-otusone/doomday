@@ -21,7 +21,7 @@ public class StaffController {
 
     @GetMapping("/profile")
     public ResponseEntity<ProfileResponse> getProfile(Authentication authentication) {
-        String email = authentication.getName(); 
+        String email = authentication.getName();
 
         Staff staff = staffRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
