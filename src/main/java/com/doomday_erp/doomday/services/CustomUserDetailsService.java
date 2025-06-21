@@ -17,15 +17,18 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     private final StaffRepository staffRepository;
 
-    @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Staff staff = staffRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        return User.builder()
-                .username(staff.getEmail())
-                .password(staff.getPassword())
-                .roles(staff.getRole())
-                .build();
-    }
+    @Override
+public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+    System.out.println("🔍 Loading user: " + email);
+    Staff staff = staffRepository.findByEmail(email)
+            .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+    return User.builder()
+            .username(staff.getEmail())
+            .password(staff.getPassword())
+            .roles(staff.getRole())
+            .build();
+}
+
 }
