@@ -10,6 +10,7 @@ import com.doomday_erp.doomday.task.dto.TaskRequest;
 import com.doomday_erp.doomday.task.dto.TaskResponse;
 import com.doomday_erp.doomday.task.entity.Task;
 import com.doomday_erp.doomday.task.repository.TaskRepository;
+import com.doomday_erp.doomday.entity.User;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,7 +25,7 @@ public class TaskServiceImpl implements TaskService {
         Task task = Task.builder()
                 .title(request.getTitle())
                 .description(request.getDescription())
-                .assignedBy(request.getAssignedBy())
+                .assignedBy(new User(request.getAssignedBy()))
                 .assignedTo(request.getAssignedTo())
                 .status(Task.Status.TODO)
                 .createdAt(LocalDateTime.now())
