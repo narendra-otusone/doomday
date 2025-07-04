@@ -6,27 +6,35 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.doomday_erp.doomday.entity.User;
+import com.doomday_erp.doomday.repository.UserRepository;
 import com.doomday_erp.doomday.task.dto.TaskRequest;
 import com.doomday_erp.doomday.task.dto.TaskResponse;
 import com.doomday_erp.doomday.task.entity.Task;
 import com.doomday_erp.doomday.task.repository.TaskRepository;
-import com.doomday_erp.doomday.entity.User;
 
 import lombok.RequiredArgsConstructor;
 
-@Service
 @RequiredArgsConstructor
+@Service
 public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository taskRepository;
+    private final UserRepository userRepository;
 
     @Override
     public TaskResponse createTask(TaskRequest request) {
+        Long assignedById = Long.valueOf(request.getAssignedBy());
+        User assignedByUser = userRepository.findById(assignedById)
+                .orElseThrow(() -> new RuntimeException("AssignedBy user not found"));
+        Long assignedToId = Long.valueOf(request.getAssignedTo());
+        User assignedToUser = userRepository.findById(assignedToId)
+                .orElseThrow(() -> new RuntimeException("AssignedTo user not found"));
         Task task = Task.builder()
                 .title(request.getTitle())
                 .description(request.getDescription())
-                .assignedBy(new User(request.getAssignedBy()))
-                .assignedTo(request.getAssignedTo())
+                .assignedBy(assignedByUser)
+                .assignedTo(assignedToUser)
                 .status(Task.Status.TODO)
                 .createdAt(LocalDateTime.now())
                 .dueDate(request.getDueDate())
@@ -55,8 +63,8 @@ public class TaskServiceImpl implements TaskService {
                 .id(task.getId())
                 .title(task.getTitle())
                 .description(task.getDescription())
-                .assignedBy(task.getAssignedBy())
-                .assignedTo(task.getAssignedTo())
+                .assignedBy(task.getAssignedBy() != null ? String.valueOf(task.getAssignedBy().getId()) : null)
+                .assignedTo(task.getAssignedTo() != null ? String.valueOf(task.getAssignedTo().getId()) : null)
                 .status(task.getStatus())
                 .dueDate(task.getDueDate())
                 .createdAt(task.getCreatedAt())
