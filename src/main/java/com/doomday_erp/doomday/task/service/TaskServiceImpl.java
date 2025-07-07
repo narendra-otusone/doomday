@@ -45,7 +45,10 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public List<TaskResponse> getTasksForUser(String userId) {
-        return taskRepository.findByAssignedTo(userId).stream()
+        Long userIdLong = Long.valueOf(userId);
+        User user = userRepository.findById(userIdLong)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return taskRepository.findByAssignedTo(user).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
