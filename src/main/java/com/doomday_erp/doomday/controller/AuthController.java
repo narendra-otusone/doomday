@@ -75,8 +75,6 @@ public class AuthController {
         }
     }
 
-
-  
     @PostMapping("/admin/login")
     public ResponseEntity<LoginResponse> adminLogin(@RequestBody LoginRequest request) {
         System.out.println("Received LoginRequest: " + request);
@@ -95,4 +93,41 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/user/register")
+    public ResponseEntity<RegisterResponse> userRegister(@RequestBody RegisterRequest request) {
+        if (staffRepository.findByEmail(request.getEmail()).isPresent()) {
+            return ResponseEntity.badRequest().body(new RegisterResponse(null, "Email already registered"));
+        }
+
+        Staff staff = Staff.builder()
+                .fullName(request.getFullName())
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .role(request.getRole())
+                .build();
+
+        staffRepository.save(staff);
+
+        String token = jwtService.generateToken(staff.getEmail());
+
+        return ResponseEntity.ok(new RegisterResponse(token, "Registration successful"));
+    }
+
+    @PostMapping("/user/login")
+    public ResponseEntity<LoginResponse> userLogin(@RequestBody LoginRequest request) {
+        System.out.println("Received LoginRequest: " + request);
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+            );
+
+            // If successful, generate token
+            String token = jwtService.generateToken(request.getEmail());
+
+            return ResponseEntity.ok(new LoginResponse(token, "Login successful"));
+        } catch (AuthenticationException ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new LoginResponse(null, "Invalid email or password"));
+        }
+    }
 }

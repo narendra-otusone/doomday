@@ -26,5 +26,6 @@ public class User {
 
     private String fullName;
     private String email;
+    private String password;
     private String role; // e.g., STUDENT, PARENT, ADMIN
 }
